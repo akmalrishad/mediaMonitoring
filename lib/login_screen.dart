@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:web_media_monitoring/model/loginModel.dart';
+import 'package:web_media_monitoring/service/ApiService.dart';
 import 'package:web_media_monitoring/signup_screen.dart';
 import 'package:http/http.dart' as http;
 
@@ -29,6 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  late ApiService apiService = new ApiService();
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +102,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                 backgroundColor:
                                     MaterialStateProperty.all(Colors.blue)),
                             onPressed: () {
-                              login();
+                              apiService.login(emailController.text,
+                                  passwordController.text);
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Dashboard()));
                             },
                             child: Text(
                               "Login",
@@ -125,22 +132,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   )),
             )));
-  }
-
-  Future<LoginResponseModel?> login() async {
-    final Uri apiUrl = Uri.parse("http://localhost/8000/user");
-
-    final response = await http.post(apiUrl,
-        body: {"email": emailController, "password": passwordController});
-
-    if (response.statusCode == 200) {
-      final String responseString = response.body;
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => Dashboard()));
-      return loginResponseModelFromJson(responseString);
-    } else {
-      return null;
-    }
   }
 
 //   bool validateAndSave() {
